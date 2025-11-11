@@ -6,6 +6,9 @@ import pandas as pd
 import pyshellman
 
 
+_HARTREE_TO_EV_FACTOR = 27.2113834
+
+
 class JobOutput:
     """Class representing the output of a single ORCA job."""
 
@@ -17,9 +20,24 @@ class JobOutput:
         return
 
     @property
-    def scf_energy(self) -> float:
-        """Return the SCF energy from the properties."""
+    def energy_scf(self) -> float:
+        """Return the SCF energy (in Hartree) from the properties."""
         return self.properties["Geometry_1"]["SCF_Energy"]["SCF_ENERGY"]
+
+    @property
+    def energy_homo(self) -> float:
+        """Return the HOMO energy (in Hartree) from the orbital data."""
+        return self.mos.loc[self.mos["homo"], "energy_hartree"].values[0]
+
+    @property
+    def energy_lumo(self) -> float:
+        """Return the LUMO energy (in Hartree) from the orbital data."""
+        return self.mos.loc[self.mos["lumo"], "energy_hartree"].values[0]
+
+    @property
+    def energy_gap_homo_lumo(self) -> float:
+        """Return the energy gap between HOMO and LUMO (in Hartree)."""
+        return self.energy_lumo - self.energy_homo
 
     @property
     def mos(self):
@@ -101,7 +119,7 @@ class JobOutput:
                 "symmetry": mo["OrbitalSymmetry"],
                 "occupancy": mo["Occupancy"],
                 "energy_hartree": mo["OrbitalEnergy"],
-                "energy_ev": mo["OrbitalEnergy"] * 27.2114,
+                "energy_ev": mo["OrbitalEnergy"] * _HARTREE_TO_EV_FACTOR,
                 **{f"coeff_{i+1}": coeff for i, coeff in enumerate(mo["MOCoefficients"])},
             }
             data.append(row)
