@@ -3,7 +3,7 @@ from pathlib import Path
 import pyshellman
 
 from pyorca import settings
-from pyorca.output import JobOutput
+from pyorca.output.main import JobOutput
 
 
 def run(
@@ -45,7 +45,7 @@ def run(
         raise_stderr=False,
         timeout=timeout,
     )
-    output_base_name = output_base_name or Path(input_path).with_suffix("")
+    output_base_name = Path(output_base_name) if output_base_name else Path(input_path).with_suffix("")
     output_base_name.with_suffix(".out").write_text(output.out, encoding="utf-8")
     if output.err:
         output_base_name.with_suffix(".err").write_text(output.err, encoding="utf-8")
