@@ -2,7 +2,7 @@ from typing import Sequence
 from pathlib import Path
 
 import pyorca
-from pyorca.output import JobOutput
+from pyorca.output.main import JobOutput
 from pyorca.input.block.coords._base import CoordinatesInputBlock
 from pyorca.input.block._base import InputBlock
 
@@ -32,7 +32,7 @@ class InputFile:
         stream_stderr: bool = True,
         timeout: float | None = None,
     ) -> JobOutput:
-        output_base_name = Path(output_base_name) or Path.cwd() / "orca_job"
+        output_base_name = Path(output_base_name) if output_base_name else Path.cwd() / "orca_job"
         output_base_name.parent.mkdir(parents=True, exist_ok=True)
         input_path = output_base_name.with_suffix(".inp")
         input_path.write_text(str(self), encoding="utf-8")
